@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vue MQTT Sample</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@3.1.5/dist/vuetify.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons">
+</head>
+<body>
+  <div id="app">
+      <v-card>
+        <v-card-title>
+          <h2>Temperature</h2>
+        </v-card-title>
+        <v-card-text>
+          <p>[[ temperature.value ]] &#8451;</p>
+        </v-card-text>
+      </v-card>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/socket.io-client/dist/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@3.1.5/dist/vuetify.min.js"></script>
+  <!-- Load the Vue app and connect to the WebSocket server -->
+  <script>
+    const { createApp, ref, onMounted } = Vue
+    const { createVuetify } = Vuetify
+    const vuetify = createVuetify()
+
+    const app = createApp({
+      setup() {
+        const temperature = ref(0)
+
+        onMounted(() => {
+          const socket = io('http://192.168.15.65:5000')
+          socket.on('mqtt_message', (message) => {
+            if (message.topic === 'test_temperature') {
+              console.log(parseFloat(message.payload))
+              temperature.value = ref(parseFloat(message.payload))
+            }
+          })
+        })
+
+        return {
+          temperature
+        }
+      },
+      delimiters: ['[[', ']]']
+    })
+    
+    app
+      .use(vuetify)
+      .mount('#app')
+
+  </script>
+</body>
+</html>
+
