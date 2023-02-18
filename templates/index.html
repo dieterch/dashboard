@@ -9,19 +9,24 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons">
 </head>
 <body>
-  <div id="app">
-      <v-card>
-        <v-card-title>
-          <h2>Temperature</h2>
-        </v-card-title>
-        <v-card-text>
-          <p>[[ temperature.value ]] &#8451;</p>
-        </v-card-text>
-      </v-card>
-  </div>
-  <pre>
+  <v-app>
+        <div id="app">
+            <v-card>
+              <v-card-title>
+                <h2>[[ room.value ]]</h2>
+              </v-card-title>
+              <v-card-text>
+                <p>[[ temperature.value ]] &#8451;</p>
+                <p>[[ humidity.value ]] &#37;</p>
+                <p>[[ baro_pressure.value ]] bar</p>
+              </v-card-text>
+            </v-card>
+        </div>
+  </v-app>
+
+  <!--pre>
     {{ data }}
-  </pre>
+  </pre-->
 
 
   <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
@@ -37,22 +42,37 @@
 
     const app = createApp({
       setup() {
+        const room = ref('')
         const temperature = ref(0)
+        const humidity = ref(0)
+        const baro_pressure = ref(0)
 
         onMounted(() => {
           // const socket = io('http://192.168.15.23:5000')
           const socket = io('http://{{ data.server_ip }}:{{ data.server_port }}')
           socket.on('mqtt_message', (message) => {
-            // console.log(message)
+            console.log(message)
+            room.value = ref('Room')
             if (message.topic === 'dashboard/dummy/temperature') {
               console.log(parseFloat(message.payload))
               temperature.value = ref(parseFloat(message.payload))
+            }
+            if (message.topic === 'dashboard/dummy/humidity') {
+              console.log(parseFloat(message.payload))
+              humidity.value = ref(parseFloat(message.payload))
+            }
+            if (message.topic === 'dashboard/dummy/baro_pressure') {
+              console.log(parseFloat(message.payload))
+              baro_pressure.value = ref(parseFloat(message.payload))
             }
           })
         })
 
         return {
-          temperature
+          room,
+          temperature,
+          humidity,
+          baro_pressure
         }
       },
       delimiters: ['[[', ']]']

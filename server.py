@@ -38,7 +38,7 @@ def index():
 def handle_connect():
     print('WebSocket client connected')
     # Subscribe to the MQTT topic when the WebSocket client connects
-    mqtt_client.subscribe('dashboard/dummy/temperature')
+    mqtt_client.subscribe('dashboard/dummy/#')
 
 # Set up the WebSocket disconnection
 @socketio.on('disconnect')
