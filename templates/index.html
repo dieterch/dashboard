@@ -52,7 +52,7 @@
           const socket = io('http://{{ data.server_ip }}:{{ data.server_port }}')
           socket.on('mqtt_message', (message) => {
             console.log(message)
-            room.value = ref('Room')
+            room.value = ref(message.topic.split('/')[1])
             if (message.topic === 'dashboard/dummy/temperature') {
               console.log(parseFloat(message.payload))
               temperature.value = ref(parseFloat(message.payload))
