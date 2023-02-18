@@ -19,7 +19,11 @@
         </v-card-text>
       </v-card>
   </div>
-  
+  <pre>
+    {{ data }}
+  </pre>
+
+
   <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/socket.io-client/dist/socket.io.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vuetify@3.1.5/dist/vuetify.min.js"></script>
@@ -29,14 +33,18 @@
     const { createVuetify } = Vuetify
     const vuetify = createVuetify()
 
+    console.log('http://{{ data.server_ip }}:{{ data.server_port }}')
+
     const app = createApp({
       setup() {
         const temperature = ref(0)
 
         onMounted(() => {
-          const socket = io('http://192.168.15.65:5000')
+          // const socket = io('http://192.168.15.23:5000')
+          const socket = io('http://{{ data.server_ip }}:{{ data.server_port }}')
           socket.on('mqtt_message', (message) => {
-            if (message.topic === 'test_temperature') {
+            console.log(message)
+            if (message.topic === 'dashboard/dummy/temperature') {
               console.log(parseFloat(message.payload))
               temperature.value = ref(parseFloat(message.payload))
             }
