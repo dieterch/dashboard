@@ -25,6 +25,8 @@ def on_message(client, userdata, message):
 # Set up the Flask route to serve the Vue HTML
 @app.route('/')
 def index():
+    #server_ip = request.host.split(':')[0]
+    #server_port = request.host.split(':')[1]
     data = {
         'server_ip': cfg.server_ip,
         'server_port': cfg.server_port
