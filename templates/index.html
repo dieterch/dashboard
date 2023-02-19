@@ -13,8 +13,11 @@
         <div id="app">
             <v-card>
               <v-card-title>
-                <h2>[[ room.value ]]</h2>
+                <h3>[[ room.value ]]</h3>
               </v-card-title>
+              <v-card-subtitle>
+                [[ ltimestamp.value ]]
+              </v-card-subtitle>
               <v-card-text>
                 <p>[[ temperature.value ]] &#8451;</p>
                 <p>[[ humidity.value ]] &#37;</p>
@@ -42,6 +45,7 @@
 
     const app = createApp({
       setup() {
+        const ltimestamp = ref('')
         const room = ref('')
         const temperature = ref(0)
         const humidity = ref(0)
@@ -51,9 +55,13 @@
           // const socket = io('http://192.168.15.23:5000')
           const socket = io('http://{{ data.server_ip }}:{{ data.server_port }}')
           socket.on('mqtt_message', (message) => {
-            console.log(message)
+            console.log(message, message.topic)
             lroom = message.topic.split('/')[1]
             room.value = ref(lroom)
+            if (message.topic === 'dashboard/' + lroom + '/timestamp') {
+              console.log(message.payload)
+              ltimestamp.value = ref(message.payload)
+            }
             if (message.topic === 'dashboard/' + lroom + '/temperature') {
               console.log(parseFloat(message.payload))
               temperature.value = ref(parseFloat(message.payload))
@@ -71,6 +79,7 @@
 
         return {
           room,
+          ltimestamp,
           temperature,
           humidity,
           baro_pressure
