@@ -16,12 +16,12 @@
                 <h3>[[ room.value ]]</h3>
               </v-card-title>
               <v-card-subtitle>
-                [[ mdat.tstamp ]]
+                [[ mdat.date.toLocaleString() ]]
               </v-card-subtitle>
               <v-card-text>
-                <p>[[ mdat.temperature ]] &#8451;</p>
-                <p>[[ mdat.humidity ]] &#37;</p>
-                <p>[[ mdat.baro_pressure ]] bar</p>
+                <p>[[ mdat.temperature.toFixed(2) ]] &#8451;</p>
+                <p>[[ mdat.humidity.toFixed(1) ]] &#37;</p>
+                <p>[[ mdat.baro_pressure.toFixed(3) ]] bar</p>
               </v-card-text>
             </v-card>
         </div>
@@ -46,7 +46,7 @@
       setup() {
         let room = ref('')
         let mdat = ref({
-          date : "",
+          date : new Date(0),
           tstamp: 0,
           temperature : 0,
           humidity : 0,
@@ -62,8 +62,8 @@
             room.value = ref(lroom)
             if (message.topic === 'dashboard/' + lroom) {
               mdat.value = JSON.parse(message.payload)
-              let date = new Date(mdat.value.tstamp * 1000) 
-              console.log(mdat.value.tstamp, date)
+              mdat.value.date = new Date(mdat.value.tstamp) 
+              console.log(mdat.value)
             }
            })
         })
