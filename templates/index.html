@@ -16,12 +16,12 @@
                 <h3>[[ room.value ]]</h3>
               </v-card-title>
               <v-card-subtitle>
-                [[ ltimestamp.value ]]
+                [[ mdat.tstamp ]]
               </v-card-subtitle>
               <v-card-text>
-                <p>[[ temperature.value ]] &#8451;</p>
-                <p>[[ humidity.value ]] &#37;</p>
-                <p>[[ baro_pressure.value ]] bar</p>
+                <p>[[ mdat.temperature ]] &#8451;</p>
+                <p>[[ mdat.humidity ]] &#37;</p>
+                <p>[[ mdat.baro_pressure ]] bar</p>
               </v-card-text>
             </v-card>
         </div>
@@ -30,7 +30,6 @@
   <!--pre>
     {{ data }}
   </pre-->
-
 
   <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/socket.io-client/dist/socket.io.js"></script>
@@ -45,11 +44,14 @@
 
     const app = createApp({
       setup() {
-        const ltimestamp = ref('')
-        const room = ref('')
-        const temperature = ref(0)
-        const humidity = ref(0)
-        const baro_pressure = ref(0)
+        let room = ref('')
+        let mdat = ref({
+          date : "",
+          tstamp: 0,
+          temperature : 0,
+          humidity : 0,
+          baro_pressure : 0
+        })
 
         onMounted(() => {
           // const socket = io('http://192.168.15.23:5000')
@@ -58,31 +60,17 @@
             console.log(message, message.topic)
             lroom = message.topic.split('/')[1]
             room.value = ref(lroom)
-            if (message.topic === 'dashboard/' + lroom + '/timestamp') {
-              console.log(message.payload)
-              ltimestamp.value = ref(message.payload)
+            if (message.topic === 'dashboard/' + lroom) {
+              mdat.value = JSON.parse(message.payload)
+              let date = new Date(mdat.value.tstamp * 1000) 
+              console.log(mdat.value.tstamp, date)
             }
-            if (message.topic === 'dashboard/' + lroom + '/temperature') {
-              console.log(parseFloat(message.payload))
-              temperature.value = ref(parseFloat(message.payload))
-            }
-            if (message.topic === 'dashboard/' + lroom + '/humidity') {
-              console.log(parseFloat(message.payload))
-              humidity.value = ref(parseFloat(message.payload))
-            }
-            if (message.topic === 'dashboard/' + lroom + '/baro_pressure') {
-              console.log(parseFloat(message.payload))
-              baro_pressure.value = ref(parseFloat(message.payload))
-            }
-          })
+           })
         })
 
         return {
           room,
-          ltimestamp,
-          temperature,
-          humidity,
-          baro_pressure
+          mdat
         }
       },
       delimiters: ['[[', ']]']

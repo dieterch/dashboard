@@ -22,10 +22,6 @@ mqtt_client.connect(cfg.mqttserver_ip, cfg.mqttserver_port, 60)
 def on_message(client, userdata, message):
     # Forward the MQTT message to the WebSocket client
     # print("message received " ,str(message.payload.decode("utf-8")))
-    ttopic = "/".join(str(message.topic).split('/')[:2])+'/timestamp'
-    tpayload = f"{datetime.datetime.now():'%Y-%m-%d %H:%M:%S'}"[1:-1]
-    #print(f"topic:{ttopic} {tpayload}")
-    socketio.emit('mqtt_message', {'topic': ttopic, 'payload': tpayload})
     socketio.emit('mqtt_message', {'topic': message.topic, 'payload': message.payload.decode()})
 
 # Set up the Flask route to serve the Vue HTML
